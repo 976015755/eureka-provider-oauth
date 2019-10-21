@@ -1,0 +1,40 @@
+server:
+  port: 8863
+spring:
+  datasource:
+    driver-class-name: com.mysql.cj.jdbc.Driver
+#   url: jdbc:mysql://39.108.208.120:3306/gift?serverTimezone=GMT%2B8&useSSL=false
+    url: jdbc:mysql://127.0.0.1:3306/gift?serverTimezone=GMT%2B8&useSSL=false
+    username: root
+    password: fdas123f@##1adffafd3123fsda!@#das
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    show-sql: true
+  redis:
+    host: 127.0.0.1
+    port: 6379
+    database: 12
+    jedis:
+      pool:
+        max-active: 8 #最大连接激活数
+        max-idle: 8 #最大空闲数
+        max-wait: -1 #最大等待时间
+        min-idle: 0 #最小空闲活动连接数
+  http:
+    encoding:
+      charset: UTF-8
+      force: true
+      enabled: true
+  cache:
+    type: redis
+    redis:
+      time-to-live: 3600s #默认缓存时间
+      cache-null-values: false
+  application:
+    name: service-oauth #服务之间的调用使用这个名字
+eureka:
+  client:
+    service-url:
+      default-zone: http://localhost:8761/eureka/ #服务注册到哪些Eureka Service
+
