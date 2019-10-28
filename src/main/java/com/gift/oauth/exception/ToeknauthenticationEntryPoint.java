@@ -1,4 +1,4 @@
-package com.gift.filter;
+package com.gift.oauth.exception;
 
 import java.io.IOException;
 import java.io.PrintWriter;

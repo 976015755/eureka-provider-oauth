@@ -23,8 +23,7 @@ public class UserdetailServiceImpl implements UserDetailsService {
 		if(user != null) {
 			return new UserdetailsImpl(user);
 		} else {
-			System.out.println("没有该用户");
-			throw new UsernameNotFoundException("没有该用户");
+			throw new UsernameNotFoundException("user not exitst!");
 		}
 	}
 }
