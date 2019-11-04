@@ -26,4 +26,7 @@ public class User {
 	
 	@Column(columnDefinition = "bit", name = "u_level")
 	private Integer level;
+	
+	@Column(columnDefinition = "varchar(255) NOT NULL DEFAULT ''", name = "u_mobile")
+	private String mobile;
 }

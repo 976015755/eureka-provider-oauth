@@ -9,6 +9,7 @@ public class TestController {
 	
 	@RequestMapping(value = "hello")
 	public String test() {
+//		throw new IllegalArgumentException("hello world 参数错误！");
 		return "hello world";
 	}
 	

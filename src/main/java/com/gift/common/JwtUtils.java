@@ -6,8 +6,6 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.UUID;
 
-import org.apache.commons.lang.StringUtils;
-
 import com.gift.dao.User;
 
 import io.jsonwebtoken.Claims;
@@ -46,6 +44,7 @@ public class JwtUtils {
 		claimsHashMap.put("id", user.getUid());
 		claimsHashMap.put("username", user.getUsername());
 		claimsHashMap.put("level", user.getLevel());
+		claimsHashMap.put("mobile", user.getMobile());
 		
 		
 		//签发人
@@ -87,8 +86,11 @@ public class JwtUtils {
 			return claims;
 		} catch (Exception e) {
 			e.printStackTrace();
+			return null;
+			//throw e;
+			//e.printStackTrace();
 		}
-		return null;
+		
 	}
 	
 	/**

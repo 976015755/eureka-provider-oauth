@@ -18,9 +18,13 @@ import org.springframework.security.web.header.Header;
 import org.springframework.security.web.header.writers.StaticHeadersWriter;
 
 import com.gift.common.Md5Utils;
-import com.gift.filter.AuthFilter;
+import com.gift.exception.MyExceptionHandler;
+import com.gift.filter.JwtCodeLoginFilter;
+import com.gift.filter.JwtTokenAuthFilter;
 import com.gift.oauth.exception.MyAccessDeniedHandler;
+import com.gift.oauth.exception.MyLogoutSuccessHandler;
 import com.gift.oauth.exception.ToeknauthenticationEntryPoint;
+import com.gift.oauth.provider.MyJwtCodeProvider;
 import com.gift.oauth.provider.MyJwtTokenProvider;
 
 
@@ -35,6 +39,12 @@ import com.gift.oauth.provider.MyJwtTokenProvider;
 public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	@Autowired
 	UserdetailServiceImpl userServiceDetail;
+	
+	@Autowired
+	private MyLogoutSuccessHandler myLogoutSuccessHandler;
+	
+//	@Autowired
+//	private MyLogoutHandler myLogoutHandler;
 	
 	@Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -66,10 +76,17 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //			.addFilter(new JwtLoginfilter())
 			.apply(new JsonLoginConfigurer<>(authenticationManager()))
 			.and()
-			.addFilterBefore(new AuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtTokenAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
+			.addFilterBefore(jwtCodeLoginFilter(authenticationManager(), new MyExceptionHandler()), UsernamePasswordAuthenticationFilter.class)
 			
+			.logout()
+//				.addLogoutHandler(myLogoutHandler)
+				.logoutSuccessHandler(myLogoutSuccessHandler)
+//				.permitAll()
+			
+			.and()
 			.exceptionHandling()
-//				.authenticationEntryPoint(new ToeknauthenticationEntryPoint())//设置未通过验证的错误提醒信息
+				.authenticationEntryPoint(new ToeknauthenticationEntryPoint())//设置未通过验证的错误提醒信息
 				.accessDeniedHandler(new MyAccessDeniedHandler())
 //				.accessDeniedPage("/test/hello");//已登陆，访问未授权页面的错误处理页面
 			;
@@ -80,28 +97,51 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 	 * 配置验证方式
 	 */
 	@Override
-    protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-		
-		auth.authenticationProvider(new MyJwtTokenProvider());
-		
+    protected void configure(AuthenticationManagerBuilder auth) throws Exception {	
+		auth.authenticationProvider(myJwtTokenProvider());
+		auth.authenticationProvider(myJwtCodeProvider());
         //auth.userDetailsService(userServiceDetail).passwordEncoder(new BCryptPasswordEncoder());
-		
 		auth.userDetailsService(userServiceDetail).passwordEncoder(new PasswordEncoder() {
-			
 			@Override
 			public boolean matches(CharSequence rawPassword, String encodedPassword) {
 				return encodedPassword.equals(Md5Utils.md5((String)rawPassword));
-				
 			}
-			
 			@Override
 			public String encode(CharSequence rawPassword) {
-				// TODO Auto-generated method stub
 				return Md5Utils.md5((String)rawPassword);
 			}
 		});
 		
     }
+	
+	/**
+	 * 将MyJwtTokenProvider注入，注入后，该类里才能使用@autowire注解
+	 * @return
+	 */
+	@Bean
+	public MyJwtTokenProvider myJwtTokenProvider() {
+		return new MyJwtTokenProvider();
+	}
+	
+	@Bean
+	public MyJwtCodeProvider myJwtCodeProvider() {
+		return new MyJwtCodeProvider();
+	}
+	
+//	@Bean
+//	public MyLogoutSuccessHandler myLogoutSuccessHandler() {
+//		return new MyLogoutSuccessHandler();
+//	}
+	
+	@Bean
+	public JwtTokenAuthFilter jwtTokenAuthFilter(AuthenticationManager authenticationManager) {
+		return new JwtTokenAuthFilter(authenticationManager);
+	}
+	
+	@Bean
+	public JwtCodeLoginFilter jwtCodeLoginFilter(AuthenticationManager authenticationManager, MyExceptionHandler myExceptionHandler) {
+		return new JwtCodeLoginFilter(authenticationManager, myExceptionHandler);
+	}
 	
 	@Override
     @Bean
@@ -109,7 +149,6 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
         return super.authenticationManagerBean();
     }
 }
-
 
 class MyPasswordEncoder implements PasswordEncoder {
     @Override

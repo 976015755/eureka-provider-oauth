@@ -45,15 +45,12 @@ public class MyAuthenticationToken extends AbstractAuthenticationToken {
 	
 	@Override
 	public Object getCredentials() {
-		// TODO Auto-generated method stub
 		return null;
 	}
 
 	@Override
 	public Object getPrincipal() {
 		return principal;
-		// TODO Auto-generated method stub
-		//return null;
 	}
 	
 	@Override

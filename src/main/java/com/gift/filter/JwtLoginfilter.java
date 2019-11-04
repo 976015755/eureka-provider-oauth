@@ -27,8 +27,6 @@ public class JwtLoginfilter extends AbstractAuthenticationProcessingFilter {
 	public Authentication attemptAuthentication(HttpServletRequest request,
 			HttpServletResponse response) throws AuthenticationException {
 		
-		System.out.println("attemptAuthentication");
-		
 		this.setAuthenticationSuccessHandler(new MyAuthenticationSuccessHandler());//登陆成功的处理方法
 		this.setAuthenticationFailureHandler(new MyAuthenticationFailureHandler());//登陆失败的处理方法
 

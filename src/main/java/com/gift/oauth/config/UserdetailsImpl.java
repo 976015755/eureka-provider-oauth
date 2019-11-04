@@ -19,6 +19,7 @@ public class UserdetailsImpl extends User implements UserDetails {
 		this.setUid(user.getUid());
 		this.setPassword(user.getPassword());
 		this.setUsername(user.getUsername());
+		this.setMobile(user.getMobile());
 	}
 	
 	@Override

@@ -9,10 +9,12 @@ import javax.servlet.http.HttpServletResponse;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.web.authentication.AuthenticationFailureHandler;
+import org.springframework.stereotype.Component;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.gift.common.ResponseJson;
 
+@Component
 public class MyAuthenticationFailureHandler implements AuthenticationFailureHandler {
 	@Autowired
 	ObjectMapper objectMapper;
