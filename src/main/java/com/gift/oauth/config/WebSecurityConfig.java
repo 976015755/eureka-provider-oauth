@@ -20,6 +20,7 @@ import org.springframework.security.web.header.writers.StaticHeadersWriter;
 import com.gift.common.Md5Utils;
 import com.gift.exception.MyExceptionHandler;
 import com.gift.filter.JwtCodeLoginFilter;
+import com.gift.filter.JwtLoginfilter;
 import com.gift.filter.JwtTokenAuthFilter;
 import com.gift.oauth.exception.MyAccessDeniedHandler;
 import com.gift.oauth.exception.MyLogoutSuccessHandler;
@@ -52,7 +53,12 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		http
 			.authorizeRequests()									//定义哪些URL需要被保护，哪些不需要
 				.antMatchers("/test/hello").permitAll()				//不需要保护，可以任意访问
-				.antMatchers("/logina").permitAll()					//不需要保护，可以任意访问
+				.antMatchers("/logina").permitAll()					
+//				.antMatchers("/user/send_code").permitAll()
+//				.antMatchers("/token/**").permitAll()
+				.antMatchers("/service-user/user/send_code").permitAll()
+				.antMatchers("/service-user/token/**").permitAll()
+				.antMatchers("/service-user/user/valid_code").permitAll()
 				.anyRequest()										//任何请求
 				.authenticated()									//登陆后可以访问
 			.and()
@@ -74,8 +80,9 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //			.httpBasic()											//通过弹窗输入用户名密码的方式验证用户
 //			.and()
 //			.addFilter(new JwtLoginfilter())
-			.apply(new JsonLoginConfigurer<>(authenticationManager()))
-			.and()
+//			.apply(new JsonLoginConfigurer<>(authenticationManager()))
+//			.and()
+			.addFilterBefore(jwtLoginfilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(jwtTokenAuthFilter(authenticationManager()), UsernamePasswordAuthenticationFilter.class)
 			.addFilterBefore(jwtCodeLoginFilter(authenticationManager(), new MyExceptionHandler()), UsernamePasswordAuthenticationFilter.class)
 			
@@ -123,6 +130,10 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 		return new MyJwtTokenProvider();
 	}
 	
+	/**
+	 * 将JwtCodeProvider注入
+	 * @return
+	 */
 	@Bean
 	public MyJwtCodeProvider myJwtCodeProvider() {
 		return new MyJwtCodeProvider();
@@ -133,16 +144,40 @@ public class WebSecurityConfig extends WebSecurityConfigurerAdapter {
 //		return new MyLogoutSuccessHandler();
 //	}
 	
+	/**
+	 * 用户名密码登陆过滤器
+	 * @param authenticationManager
+	 * @return
+	 */
+	@Bean
+	public JwtLoginfilter jwtLoginfilter(AuthenticationManager authenticationManager) {
+		return new JwtLoginfilter(authenticationManager);
+	}
+	
+	/**
+	 * TOKEN登陆过滤器
+	 * @param authenticationManager
+	 * @return
+	 */
 	@Bean
 	public JwtTokenAuthFilter jwtTokenAuthFilter(AuthenticationManager authenticationManager) {
 		return new JwtTokenAuthFilter(authenticationManager);
 	}
 	
+	/**
+	 * 验证码登陆过滤器
+	 * @param authenticationManager
+	 * @param myExceptionHandler
+	 * @return
+	 */
 	@Bean
 	public JwtCodeLoginFilter jwtCodeLoginFilter(AuthenticationManager authenticationManager, MyExceptionHandler myExceptionHandler) {
 		return new JwtCodeLoginFilter(authenticationManager, myExceptionHandler);
 	}
 	
+	/**
+	 * authenticationmanager
+	 */
 	@Override
     @Bean
     public AuthenticationManager authenticationManagerBean() throws Exception {

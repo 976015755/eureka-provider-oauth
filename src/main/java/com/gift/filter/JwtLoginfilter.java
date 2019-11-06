@@ -3,6 +3,7 @@ package com.gift.filter;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
@@ -23,12 +24,17 @@ public class JwtLoginfilter extends AbstractAuthenticationProcessingFilter {
 		setAuthenticationManager(authenticationManager);
 	}
 	
+	@Autowired
+	MyAuthenticationSuccessHandler myAuthenticationSuccessHandler;
+	@Autowired
+	MyAuthenticationFailureHandler myAuthenticationFailureHandler;
+	
 	@Override
 	public Authentication attemptAuthentication(HttpServletRequest request,
 			HttpServletResponse response) throws AuthenticationException {
 		
-		this.setAuthenticationSuccessHandler(new MyAuthenticationSuccessHandler());//登陆成功的处理方法
-		this.setAuthenticationFailureHandler(new MyAuthenticationFailureHandler());//登陆失败的处理方法
+		this.setAuthenticationSuccessHandler(myAuthenticationSuccessHandler);//登陆成功的处理方法
+		this.setAuthenticationFailureHandler(myAuthenticationFailureHandler);//登陆失败的处理方法
 
 		String username = request.getParameter("username");
 		String password = request.getParameter("password");

@@ -30,6 +30,7 @@ public class MyJwtCodeProvider implements AuthenticationProvider {
 		try {
 			rs = userServiceFeignClientInterface.validCode(user.getMobile(), jwtCodeLoginToken.getCodeString());
 		} catch (Exception e) {
+			return null;
 			//e.printStackTrace();
 		}
 		

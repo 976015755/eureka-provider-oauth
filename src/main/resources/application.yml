@@ -36,4 +36,15 @@ eureka:
   client:
     service-url:
       default-zone: http://localhost:8761/eureka/ #服务注册到哪些Eureka Service
+zuul: #路由服务，注册本服务为zuul
+  routes: 
+    service-user: 
+      path: /service-user/**
+      service-id: service-user
+  ignored-services: "*"
+  ignored-patterns: #忽略路径,禁止通过网关直接访问
+    - /service-user/token/** 
+    - /service-user/user/valid_code
+  
+  
 
